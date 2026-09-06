@@ -1,60 +1,46 @@
-// ----- Datos generales -----
-let PISO  = 500;     // los pies del personaje se apoyan en esta altura
-let escala = 3;    // los sprites son chiquitos: los agrandamos al dibujar
+let alturaPiso  = 500;
+let tamañoPersonaje = 3;   
 
-// Nombres de archivo de cada animación (los recorremos con un for para cargarlos).
-//let nombresQuieto  = ['/img/sprite-1-1.png', '/img/sprite-1-2.png', '/img/sprite-1-3.png', '/img/sprite-1-4.png', '/img/sprite-1-5.png', '/img/sprite-1-6.png', '/img/sprite-1-7.png', '/img/sprite-1-8.png', '/img/sprite-1-9.png', '/img/sprite-1-10.png', '/img/sprite-1-11.png', '/img/sprite-1-12.png', '/img/sprite-1-13.png', '/img/sprite-1-14.png', '/img/sprite-1-15.png'];
-let nombresQuieto = ['/img/sprite-2-1.png', '/img/sprite-2-2.png', '/img/sprite-2-3.png', '/img/sprite-2-4.png', '/img/sprite-2-5.png', '/img/sprite-2-6.png', '/img/sprite-2-7.png', '/img/sprite-2-8.png', '/img/sprite-2-9.png', '/img/sprite-2-10.png', '/img/sprite-2-11.png'];
-let nombresCaminar = ['/img/sprite-3-1.png', '/img/sprite-3-2.png', '/img/sprite-3-3.png', '/img/sprite-3-4.png', '/img/sprite-3-5.png', '/img/sprite-3-6.png', '/img/sprite-3-7.png', '/img/sprite-3-8.png', '/img/sprite-3-9.png', '/img/sprite-3-10.png', '/img/sprite-3-11.png', '/img/sprite-3-12.png', '/img/sprite-3-13.png', '/img/sprite-3-14.png', '/img/sprite-3-15.png'];
+let estadoQuieto = ['/img/sprite-2-1.png', '/img/sprite-2-2.png', '/img/sprite-2-3.png', '/img/sprite-2-4.png', '/img/sprite-2-5.png', '/img/sprite-2-6.png', '/img/sprite-2-7.png', '/img/sprite-2-8.png', '/img/sprite-2-9.png', '/img/sprite-2-10.png', '/img/sprite-2-11.png'];
+let estadoCaminando = ['/img/sprite-3-1.png', '/img/sprite-3-2.png', '/img/sprite-3-3.png', '/img/sprite-3-4.png', '/img/sprite-3-5.png', '/img/sprite-3-6.png', '/img/sprite-3-7.png', '/img/sprite-3-8.png', '/img/sprite-3-9.png', '/img/sprite-3-10.png', '/img/sprite-3-11.png', '/img/sprite-3-12.png', '/img/sprite-3-13.png', '/img/sprite-3-14.png', '/img/sprite-3-15.png'];
 
-
-// Arreglos de frames (imágenes). Se llenan en preload().
 let framesQuieto  = [];
 let framesCaminar = [];
 
-// Imágenes de fondo y del título.
 let fondo;
 let nombre;
 
-// ----- Estado de la animación -----
-let frames = [];        // arreglo de frames del estado actual
-let indice = 0;         // frame actual dentro de ese arreglo
+// Estado de la animación
+let frames = [];
+let indice = 0;
 let ultimoCambio = 0;   // millis() del último cambio de frame
 let velocidad = 180;    // milisegundos por frame del estado actual
 
-// Velocidades propias de cada estado (distintas entre sí).
-let velQuieto  = 180;
-let velCaminar = 90;
-let velGesto   = 70;
+let velocidadQuieto  = 180;
+let velocidadCaminando = 90;
 
-// ----- Estado del personaje -----
-let estado = 'quieto';       // 'quieto' | 'caminando' | 'gesto'
-let x = 400;                 // posición horizontal
-let mirandoDerecha = true;   // si es false, espejamos el sprite
-let multVel = 1.0;           // multiplicador global de velocidad
-let paso = 3;                // cuánto avanza al caminar
+// Estado del personaje
+let estado = 'quieto';
+let x = 400;
+let mirandoDerecha = true;
+let multiVelocidad = 1.0;  
+let paso = 3;           // cuánto avanza al caminar
 
-// ----- Alternancia automática de estados -----
-let ultimoCambioEstado = 0;  // millis() del último cambio de estado
-let durQuieto  = 1500;       // ms que se queda quieto antes de caminar
-let durCaminar = 2800;       // ms que camina antes de quedarse quieto
+let ultimoCambioEstado = 0;
+let duracionQuieto  = 1500;
+let duracionCaminando = 2800;
 
-// ----- Línea de tiempo de la intro -----
-let tInicio = 0;             // millis() en que arrancó la secuencia
-let durScroll = 9000;        // ms que dura el desplazamiento del fondo
-let durFade   = 2500;        // ms que tarda el título en aparecer
+let tiempoDeInicio = 0;      
+let duracionFondo = 9000;    
+let duracionTitulo = 2500;  
 
-
-// ----- Carga de imágenes -----
 function preload() {
-  framesQuieto  = cargarFrames(nombresQuieto);
-  framesCaminar = cargarFrames(nombresCaminar);
+  framesQuieto  = cargarFrames(estadoQuieto);
+  framesCaminar = cargarFrames(estadoCaminando);
   fondo  = loadImage('/img/fondo.png');
   nombre = loadImage('/img/nombre.png');
 }
 
-// Función propia CON PARÁMETRO que RETORNA un arreglo de imágenes.
-// Usa un for para construir el arreglo con loadImage().
 function cargarFrames(nombres) {
   let lista = [];
   for (let i = 0; i < nombres.length; i++) {
@@ -63,54 +49,42 @@ function cargarFrames(nombres) {
   return lista;
 }
 
-
 function setup() {
   createCanvas(800, 600);
-  tInicio = millis();
+  tiempoDeInicio = millis();
   ultimoCambioEstado = millis();
-  cambiarEstado('quieto');   // arranca en el estado inicial
+  cambiarEstado('quieto');
 }
 
 function draw() {
-  let t = millis() - tInicio;   // tiempo transcurrido desde el inicio de la intro
-
+  let t = millis() - tiempoDeInicio;
   dibujarFondo(t);
+  actualizarEstado();
 
-  // Los estados se alternan solos (sin teclas).
-  actualizarEstadoAuto();
-
-  // ----- Máquina de estados (if / else) -----
   if (estado === 'quieto') {
-    actualizarFrame(frames, velocidad / multVel);
-
+    actualizarFrame(frames, velocidad / multiVelocidad);
   } else if (estado === 'caminando') {
-    actualizarFrame(frames, velocidad / multVel);
+    actualizarFrame(frames, velocidad / multiVelocidad);
     mover();
-
-  } else if (estado === 'gesto') {
-    let dioLaVuelta = actualizarFrame(frames, velocidad / multVel);
-    if (dioLaVuelta) cambiarEstado('quieto');
   }
 
-  dibujarSombra();
-  dibujarAnimacion(frames, indice, x, PISO, !mirandoDerecha);
-  dibujarHUD();
+  dibujarAnimacion(frames, indice, x, alturaPiso, !mirandoDerecha);
 
-  dibujarTitulo(t);   // se dibuja al final => queda enfrente de todo
+  dibujarTitulo(t); // se dibuja al final
 }
 
 // Alterna automáticamente entre 'quieto' y 'caminando' según el tiempo.
-function actualizarEstadoAuto() {
-  let dur = (estado === 'caminando') ? durCaminar : durQuieto;
+function actualizarEstado() {
+  let dur = duracionQuieto;
+  if (estado == 'caminando') dur = duracionCaminando;
+
   if (millis() - ultimoCambioEstado >= dur) {
-    cambiarEstado(estado === 'quieto' ? 'caminando' : 'quieto');
+    if (estado == 'quieto') cambiarEstado('caminando');
+    else cambiarEstado('quieto');
     ultimoCambioEstado = millis();
   }
 }
 
-// Avanza el frame según el TIEMPO (millis), no según los cuadros del programa.
-// Parámetros: el arreglo de frames y cuántos ms dura cada frame.
-// RETORNA true si en este momento dio la vuelta completa (volvió al frame 0).
 function actualizarFrame(lista, msPorFrame) {
   let dioLaVuelta = false;
   if (millis() - ultimoCambio >= msPorFrame) {
@@ -124,115 +98,84 @@ function actualizarFrame(lista, msPorFrame) {
   return dioLaVuelta;
 }
 
-// Dibuja el frame actual de CUALQUIER animación, centrado en X y apoyado en el piso.
-// Función genérica CON PARÁMETROS.
-function dibujarAnimacion(lista, i, px, piso, espejar) {
+function dibujarAnimacion(lista, i, px, alturaPiso, espejar) {
   let img = lista[i];
-  let w = img.width  * escala;
-  let h = img.height * escala;
+  let ancho = img.width  * tamañoPersonaje;
+  let alto  = img.height * tamañoPersonaje;
   push();
-  translate(px, piso);
+  translate(px, alturaPiso);
   if (espejar) scale(-1, 1);
   imageMode(CORNER);
-  image(img, -w / 2, -h, w, h);
+  image(img, -ancho / 2, -alto, ancho, alto);
   pop();
 }
 
 // Cambia de estado: elige el arreglo de frames y la velocidad, y reinicia la animación.
-// Función propia CON PARÁMETRO.
 function cambiarEstado(nuevo) {
   estado = nuevo;
   indice = 0;
   ultimoCambio = millis();
 
   if (nuevo === 'quieto') {
-    frames = framesQuieto;   // arreglo de reposo
-    velocidad = velQuieto;
+    frames = framesQuieto;  
+    velocidad = velocidadQuieto;
   } else if (nuevo === 'caminando') {
-    frames = framesCaminar;  // arreglo de caminata
-    velocidad = velCaminar;
-  } else if (nuevo === 'gesto') {
-    frames = framesQuieto;   // reusa el arreglo de reposo, pero más rápido y una sola vez
-    velocidad = velGesto;
+    frames = framesCaminar; 
+    velocidad = velocidadCaminando;
   }
 }
 
 // Movimiento horizontal al caminar; rebota en los bordes.
 function mover() {
-  let avance = paso * multVel;
+  let avance = paso * multiVelocidad;
   if (mirandoDerecha) x = x + avance; else x = x - avance;
 
   if (x > width - 130) mirandoDerecha = false;
-  if (x < 130)         mirandoDerecha = true;
+  if (x < 130) mirandoDerecha = true;
 }
 
-
-// ----- Fondo (se desplaza hacia la derecha con el tiempo) -----
 function dibujarFondo(t) {
-  // Escalado "cover": la imagen llena todo el canvas.
-  let esc = max(width / fondo.width, height / fondo.height);
-  let w = fondo.width  * esc;
-  let h = fondo.height * esc;
-  let y = (height - h) / 2;
+  let escX = width  / fondo.width;
+  let escY = height / fondo.height;
+  let esc = escX;
+  if (escY > esc) esc = escY;
 
-  let rango = w - width;                  // cuánto podemos desplazar en horizontal
+  let ancho = fondo.width  * esc;
+  let alto  = fondo.height * esc;
+  let y = (height - alto) / 2;
+
+  let rango = ancho - width;
   if (rango < 0) rango = 0;
 
-  let progreso = constrain(t / durScroll, 0, 1);
-  // Va de -rango (mostrando la parte derecha) a 0 => el fondo se desplaza hacia la derecha.
+  let progreso = t / duracionFondo;
+  if (progreso < 0) progreso = 0;
+  if (progreso > 1) progreso = 1;
+
   let fx = -rango + progreso * rango;
 
   imageMode(CORNER);
-  image(fondo, fx, y, w, h);
+  image(fondo, fx, y, ancho, alto);
 }
 
-// ----- Título: aparece al final del desplazamiento, con opacidad, enfrente del fondo -----
 function dibujarTitulo(t) {
-  if (t < durScroll) return;              // recién aparece cuando el fondo terminó de moverse
+  if (t < duracionFondo) return;   // recién aparece cuando el fondo terminó de moverse
 
-  let alpha = map(t - durScroll, 0, durFade, 0, 255, true);  // 0 -> 255
+  let alpha = map(t - duracionFondo, 0, duracionTitulo, 0, 255, true);  // 0 -> 255
 
-  let w = 640;
-  let h = nombre.height * (w / nombre.width);
+  let ancho = 600;
+  let alto  = nombre.height * (ancho / nombre.width);
 
-  push();
   imageMode(CENTER);
-  // Si querés que el fondo negro del logo desaparezca y solo se vean las letras,
-  // descomentá la línea de abajo:
-  // blendMode(SCREEN);
-  tint(255, alpha);                       // opacidad creciente
-  image(nombre, width / 2, height / 2, w, h);
-  blendMode(BLEND);
-  pop();                                  // pop() restaura el tint
+  tint(255, alpha);                       
+  image(nombre, width / 2, height / 2, ancho, alto);
+  noTint();
 }
 
-function dibujarSombra() {
-  noStroke();
-  fill(0, 60);
-  ellipse(x, PISO + 6, 90, 22);
-}
-
-
-// ----- Texto informativo -----
-function dibujarHUD() {
-  noStroke();
-  fill(0, 130);
-  rect(12, 12, 250, 82, 8);
-  fill(255);
-  textFont('monospace');
-  textSize(14);
-  text('Estado: ' + estado, 24, 36);
-  fill(200);
-  textSize(11);
-  text('R reiniciar', 24, 80);
-}
-
-// ----- Reinicio / volver al estado inicial (reinicia toda la intro) -----
 function reiniciar() {
   x = 400;
-  multVel = 1.0;
+  multiVelocidad = 1.0;
   mirandoDerecha = true;
-  tInicio = millis();
+  tiempoDeInicio = millis();
   ultimoCambioEstado = millis();
   cambiarEstado('quieto');
 }
