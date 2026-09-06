@@ -61,9 +61,9 @@ function draw() {
   dibujarFondo(t);
   actualizarEstado();
 
-  if (estado === 'quieto') {
+  if (estado == 'quieto') {
     actualizarFrame(frames, velocidad / multiVelocidad);
-  } else if (estado === 'caminando') {
+  } else if (estado == 'caminando') {
     actualizarFrame(frames, velocidad / multiVelocidad);
     mover();
   }
@@ -116,10 +116,10 @@ function cambiarEstado(nuevo) {
   indice = 0;
   ultimoCambio = millis();
 
-  if (nuevo === 'quieto') {
+  if (nuevo == 'quieto') {
     frames = framesQuieto;  
     velocidad = velocidadQuieto;
-  } else if (nuevo === 'caminando') {
+  } else if (nuevo == 'caminando') {
     frames = framesCaminar; 
     velocidad = velocidadCaminando;
   }
@@ -181,5 +181,5 @@ function reiniciar() {
 }
 
 function keyPressed() {
-  if (key === 'r' || key === 'R') reiniciar();
+  if (key == 'r' || key == 'R') reiniciar();
 }
