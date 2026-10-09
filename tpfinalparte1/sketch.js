@@ -133,8 +133,8 @@ function dibujarPantallaCreditos() {
   
   textSize(16);
   fill(180);
-  text("Autor de la obra / Guion: Nombre del Autor", width / 2, 280);
-  text("Desarrollado por: Nombre del Alumno", width / 2, 310);
+  text("Autor de la obra / Guion: Inteligencia Artificial", width / 2, 280);
+  text("Desarrollado por: Dylan Leonel Luna / Sofia Giordano", width / 2, 310);
 
   // Botón para comenzar
   dibujarBoton("Iniciar Aventura", width / 2 - 100, 360, 200, 40, 1);
