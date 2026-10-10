@@ -1,3 +1,5 @@
+//link de video:
+
 // variables globales
 let imagenes = [];
 let sonidos = {};
@@ -13,7 +15,7 @@ function preload() {
     imagenes[i] = loadImage('assets/img_' + i + '.jpg'); 
   }
 
-  // Carga de sonidos (requiere p5.sound.js en el HTML)
+  // Carga de sonidos
   sonidos.suspenso = loadSound('assets/sonidodefondo.wav');
   sonidos.click = loadSound('assets/grabacion.wav');
 }
