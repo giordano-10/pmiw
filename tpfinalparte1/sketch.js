@@ -1,3 +1,5 @@
+//link del video: 
+
 // variables globales
 let imagenes = [];
 let sonidos = {};
