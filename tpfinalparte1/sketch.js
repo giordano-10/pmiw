@@ -1,4 +1,4 @@
-//link de video:
+//link de video: https://youtu.be/cHVPPq5-ou4
 
 // variables globales
 let imagenes = [];
@@ -17,7 +17,7 @@ function preload() {
 
   // Carga de sonidos
   sonidos.suspenso = loadSound('assets/sonidodefondo.wav');
-  sonidos.click = loadSound('assets/grabacion.wav');
+  sonidos.click = loadSound('assets/click.wav');
 }
 
 function setup() {
@@ -119,7 +119,7 @@ function inicializarDatosHistoria() {
 function dibujarPantallaCreditos() {
   background(15, 20, 30);
   
-  // Animación circular de fondo
+  // Animación de fondo
   push();
   translate(width / 2, height / 2 - 40);
   rotate(anguloCreditos);
@@ -141,9 +141,11 @@ function dibujarPantallaCreditos() {
   text("THRILLER PSICOLÓGICO: CATATONIA", width / 2, 80);
   
   textSize(16);
+  
   fill(180);
-  text("Autor de la obra / Guion: Dylan Leonel Luna / Sofia Giordano", width / 2, 280);
-  text("Desarrollado por: Dylan Leonel Luna / Sofia Giordano", width / 2, 310);
+  text("Autor de la obra: Sofia Giordano", width / 2, 290);
+  text("Guion: Dylan Leonel Luna", width / 2, 315);
+  text("Desarrollado por: Dylan Leonel Luna / Sofia Giordano", width / 2, 340);
 
   // Botón para comenzar
   dibujarBoton("Iniciar Aventura", width / 2 - 100, 360, 200, 40, 1);
