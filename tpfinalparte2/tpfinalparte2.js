@@ -1,7 +1,6 @@
 const ANCHO = 800;
 const ALTO = 400;
 
-
 const RUTA_JUGADOR = "assets/jugador.png";
 const RUTAS_ENEMIGOS = [
   "assets/enemigo1.png",
