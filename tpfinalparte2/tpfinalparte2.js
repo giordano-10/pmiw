@@ -1,3 +1,5 @@
+//link del video: https://youtu.be/nlgMm-iDm1M
+
 const ANCHO = 800;
 const ALTO = 400;
 
